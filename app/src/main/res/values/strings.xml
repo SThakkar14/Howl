@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Howl</string>
+
+    <string name="logo_description">App Logo</string>
+    <string name="facebook_app_id">986984524656646</string>
+    <string name="title_activity_landing_page">LandingPage</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

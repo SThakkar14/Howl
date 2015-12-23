@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/howl_card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:layout_margin="8dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground"
+    card_view:cardCornerRadius="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/howl_card_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:maxLines="4"
+            android:text="asdfasdf"
+            android:textSize="18sp"
+            android:paddingBottom="20dp"/>
+
+        <ImageView
+            android:id="@+id/howl_card_image"
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            android:contentDescription="Pet picture"
+            android:scaleType="centerInside"
+            android:src="@drawable/logo" />
+    </LinearLayout>
+
+
+</android.support.v7.widget.CardView>
