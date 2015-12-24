@@ -16,6 +16,7 @@ import com.facebook.AccessToken;
 import java.util.List;
 
 import boomer.com.howl.API;
+import boomer.com.howl.Activities.HowlThread;
 import boomer.com.howl.HTTPCodes;
 import boomer.com.howl.Objects.Howl;
 import boomer.com.howl.Objects.UserProfile;
@@ -132,13 +133,13 @@ public class HowlsFragment extends Fragment {
                 itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-//                        Howl howl = howls.get(getAdapterPosition());
-//
-//                        Intent intent = new Intent(v.getContext(), HowlThread.class);
-//                        intent.putExtra("user_id", userProfile.getId());
-//                        intent.putExtra("id", howl.getId());
-//                        intent.putExtra("zipcode", howl.getZipcode());
-//                        startActivity(intent);
+                        Howl howl = howls.get(getAdapterPosition());
+
+                        Intent intent = new Intent(v.getContext(), HowlThread.class);
+                        intent.putExtra("user_id", userProfile.getId());
+                        intent.putExtra("id", howl.getId());
+                        intent.putExtra("zipcode", howl.getZipcode());
+                        startActivity(intent);
                     }
                 });
             }
