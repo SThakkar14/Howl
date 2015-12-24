@@ -16,6 +16,7 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
+import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
@@ -29,7 +30,7 @@ import retrofit.GsonConverterFactory;
 import retrofit.Response;
 import retrofit.Retrofit;
 
-public class SplashSpreen extends AppCompatActivity {
+public class SplashScreen extends AppCompatActivity {
     CallbackManager callbackManager;
 
     @Override
@@ -37,13 +38,12 @@ public class SplashSpreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
 
-        setContentView(R.layout.activity_splash_spreen);
+        setContentView(R.layout.activity_splash_screen);
 
         callbackManager = CallbackManager.Factory.create();
 
         LoginButton loginButton = (LoginButton) findViewById(R.id.login_button);
         loginButton.setReadPermissions("user_about_me", "email", "user_friends");
-
 
         if (AccessToken.getCurrentAccessToken() == null) {
             loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
@@ -62,6 +62,8 @@ public class SplashSpreen extends AppCompatActivity {
 
                 }
             });
+
+            LoginManager.getInstance().logOut();
 
             Animation fadeIn = new AlphaAnimation(0, 1);
             fadeIn.setDuration(500);
@@ -106,7 +108,7 @@ public class SplashSpreen extends AppCompatActivity {
     }
 
     public void loadLandingPage(UserProfile userProfile) {
-        Intent intent = new Intent(SplashSpreen.this, LandingPage.class);
+        Intent intent = new Intent(SplashScreen.this, LandingPage.class);
         intent.putExtra("user_profile", userProfile);
         startActivity(intent);
         finish();

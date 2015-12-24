@@ -111,6 +111,7 @@ public class LandingPage extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
+
             if (position == 0) {
                 if (fragments[0] == null) {
                     fragments[0] = HowlsFragment.newInstance(initialProfile);

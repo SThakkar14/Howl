@@ -11,7 +11,7 @@ import android.widget.Button;
 
 import com.facebook.login.LoginManager;
 
-import boomer.com.howl.Activities.SplashSpreen;
+import boomer.com.howl.Activities.SplashScreen;
 import boomer.com.howl.R;
 
 public class OtherFragment extends Fragment {
@@ -32,7 +32,7 @@ public class OtherFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 LoginManager.getInstance().logOut();
-                Intent intent = new Intent(getActivity(), SplashSpreen.class);
+                Intent intent = new Intent(getActivity(), SplashScreen.class);
                 startActivity(intent);
                 getActivity().finish();
             }
