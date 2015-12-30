@@ -22,6 +22,8 @@ import com.facebook.AccessToken;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import android.util.Log;
+
 
 import boomer.com.howl.HowlApiClient;
 import boomer.com.howl.HTTPCodes;
@@ -140,13 +142,18 @@ public class HowlThread extends AppCompatActivity {
 
             api = retrofit.create(HowlApiClient.class);
         }
-        String accessToken = AccessToken.getCurrentAccessToken().toString();
+        String accessToken = AccessToken.getCurrentAccessToken().getToken();
         api.get_feed(accessToken, id).enqueue(new Callback<List<Howl>>() {
+
             @Override
             public void onResponse(Response<List<Howl>> response, Retrofit retrofit) {
+                Log.i("threadResponse", String.valueOf(response.code()));
+
                 if (response.code() == HTTPCodes.OK) {
                     comments = response.body();
                     adapter.notifyDataSetChanged();
+                }else{
+
                 }
             }
 
