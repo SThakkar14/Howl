@@ -14,6 +14,8 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -78,8 +80,10 @@ public class HowlThread extends AppCompatActivity {
         this.user_id = intent.getStringExtra("user_id");
 
 
-        Button button = (Button) findViewById(R.id.submitButton);
-        button.setOnClickListener(new View.OnClickListener() {
+        //Button button = (Button) findViewById(R.id.submitButton);
+        ImageButton commentOnAHowl = (ImageButton)findViewById(R.id.commentOnAHowl);
+
+        commentOnAHowl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final EditText editText = (EditText) findViewById(R.id.editText);

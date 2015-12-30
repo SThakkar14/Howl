@@ -39,13 +39,18 @@
             android:inputType="textCapSentences|textMultiLine"
             android:maxLines="3" />
 
-        <Button
-            android:id="@+id/submitButton"
-            style="?android:attr/borderlessButtonStyle"
+        <ImageButton
+            android:id="@+id/commentOnAHowl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Submit" />
+            android:src="@drawable/ic_send_black_24dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            />
+
+
 
     </TableRow>
+
+
 
 </RelativeLayout>
