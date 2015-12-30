@@ -15,6 +15,13 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/tableRow"
         android:scrollbars="vertical" />
+    <ProgressBar
+        android:id="@+id/howls_loading"
+        style="@android:style/Widget.ProgressBar.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginRight="5dp" />
 
     <TableRow
         android:id="@+id/tableRow"

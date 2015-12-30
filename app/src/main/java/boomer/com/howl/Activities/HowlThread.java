@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -25,7 +26,6 @@ import java.util.List;
 import android.util.Log;
 
 
-import boomer.com.howl.HowlApiClient;
 import boomer.com.howl.HTTPCodes;
 import boomer.com.howl.HowlApiClient;
 import boomer.com.howl.Objects.Howl;
@@ -47,6 +47,7 @@ public class HowlThread extends AppCompatActivity {
     HowlApiClient api;
     RecyclerView.Adapter adapter;
     List<Howl> comments;
+    ProgressBar spinner;
 
     RecyclerView recyclerView;
 
@@ -54,6 +55,9 @@ public class HowlThread extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_howl_thread);
+
+        spinner = (ProgressBar)findViewById(R.id.howls_loading);
+        spinner.setVisibility(View.VISIBLE);
 
         recyclerView = (RecyclerView) findViewById(R.id.howl_thread_activity_recycler_view);
 
@@ -80,12 +84,14 @@ public class HowlThread extends AppCompatActivity {
             public void onClick(View v) {
                 final EditText editText = (EditText) findViewById(R.id.editText);
                 String text = editText.getText().toString();
+                spinner.setVisibility(View.VISIBLE);
 
                 HowlCommentBody hcb = new HowlCommentBody(zipcode, text);
                 Call<HowlCommentResponse> commentResponse = api.post_comment(accessToken, id, hcb);
                 commentResponse.enqueue(new Callback<HowlCommentResponse>() {
                     @Override
                     public void onResponse(Response<HowlCommentResponse> response, Retrofit retrofit) {
+                        spinner.setVisibility(View.GONE);
                         editText.setText("");
                         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                         imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
@@ -106,19 +112,10 @@ public class HowlThread extends AppCompatActivity {
         feed.enqueue(new Callback<List<Howl>>() {
             @Override
             public void onResponse(Response<List<Howl>> response, Retrofit retrofit) {
+                spinner.setVisibility(View.GONE);
                 comments = response.body();
 
-                Collections.sort(comments, new Comparator<Howl>() {
-                    @Override
-                    public int compare(Howl lhs, Howl rhs) {
-                        if (lhs.getCreated() > rhs.getCreated())
-                            return 1;
-                        else if (lhs.getCreated() < rhs.getCreated())
-                            return -1;
-                        else
-                            return 0;
-                    }
-                });
+                sortComments(comments);
 
                 adapter = new howl_thread_adapter();
                 recyclerView.setAdapter(adapter);
@@ -134,6 +131,7 @@ public class HowlThread extends AppCompatActivity {
     }
 
     private void updateComments() {
+
         if (api == null) {
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(Constants.BASE_URL)
@@ -147,13 +145,15 @@ public class HowlThread extends AppCompatActivity {
 
             @Override
             public void onResponse(Response<List<Howl>> response, Retrofit retrofit) {
-                Log.i("threadResponse", String.valueOf(response.code()));
-
                 if (response.code() == HTTPCodes.OK) {
                     comments = response.body();
-                    adapter.notifyDataSetChanged();
-                }else{
 
+                    sortComments(comments);
+
+                    adapter.notifyDataSetChanged();
+                    recyclerView.scrollToPosition(comments.size() - 1);
+                } else {
+                    Log.e("updateComments()", String.valueOf(response.code()));
                 }
             }
 
@@ -162,7 +162,20 @@ public class HowlThread extends AppCompatActivity {
 
             }
         });
-        recyclerView.scrollToPosition(comments.size() - 1);
+    }
+
+    private void sortComments(List<Howl> comments){
+        Collections.sort(comments, new Comparator<Howl>() {
+            @Override
+            public int compare(Howl lhs, Howl rhs) {
+                if (lhs.getCreated() > rhs.getCreated())
+                    return 1;
+                else if (lhs.getCreated() < rhs.getCreated())
+                    return -1;
+                else
+                    return 0;
+            }
+        });
     }
 
     public class howl_thread_adapter extends RecyclerView.Adapter<howl_thread_adapter.ViewHolder> {
