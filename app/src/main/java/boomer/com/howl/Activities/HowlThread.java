@@ -23,8 +23,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import boomer.com.howl.API;
+import boomer.com.howl.HowlApiClient;
 import boomer.com.howl.HTTPCodes;
+import boomer.com.howl.HowlApiClient;
 import boomer.com.howl.Objects.Howl;
 import boomer.com.howl.Objects.HowlCommentBody;
 import boomer.com.howl.Objects.HowlCommentResponse;
@@ -41,7 +42,7 @@ public class HowlThread extends AppCompatActivity {
     String zipcode;
     String id;
     String user_id;
-    API api;
+    HowlApiClient api;
     RecyclerView.Adapter adapter;
     List<Howl> comments;
 
@@ -62,7 +63,7 @@ public class HowlThread extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        api = retrofit.create(API.class);
+        api = retrofit.create(HowlApiClient.class);
         final String accessToken = AccessToken.getCurrentAccessToken().getToken();
 
         Intent intent = getIntent();
@@ -137,7 +138,7 @@ public class HowlThread extends AppCompatActivity {
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
 
-            api = retrofit.create(API.class);
+            api = retrofit.create(HowlApiClient.class);
         }
         String accessToken = AccessToken.getCurrentAccessToken().toString();
         api.get_feed(accessToken, id).enqueue(new Callback<List<Howl>>() {

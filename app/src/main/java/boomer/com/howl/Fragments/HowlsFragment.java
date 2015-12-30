@@ -15,9 +15,10 @@ import com.facebook.AccessToken;
 
 import java.util.List;
 
-import boomer.com.howl.API;
+import boomer.com.howl.HowlApiClient;
 import boomer.com.howl.Activities.HowlThread;
 import boomer.com.howl.HTTPCodes;
+import boomer.com.howl.HowlApiClient;
 import boomer.com.howl.Objects.Howl;
 import boomer.com.howl.Objects.UserProfile;
 import boomer.com.howl.R;
@@ -30,7 +31,7 @@ import retrofit.Retrofit;
 public class HowlsFragment extends Fragment {
     UserProfile userProfile;
     List<Howl> howls;
-    API api;
+    HowlApiClient api;
     RecyclerView.Adapter adapter;
 
     public HowlsFragment() {
@@ -80,7 +81,7 @@ public class HowlsFragment extends Fragment {
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
 
-            api = retrofit.create(API.class);
+            api = retrofit.create(HowlApiClient.class);
         }
 
         String accessToken = AccessToken.getCurrentAccessToken().getToken();

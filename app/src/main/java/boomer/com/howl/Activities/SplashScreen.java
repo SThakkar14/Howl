@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -20,8 +21,9 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
-import boomer.com.howl.API;
+import boomer.com.howl.HowlApiClient;
 import boomer.com.howl.HTTPCodes;
+import boomer.com.howl.HowlApiClient;
 import boomer.com.howl.Objects.UserProfile;
 import boomer.com.howl.R;
 import boomer.howl.Constants;
@@ -54,12 +56,11 @@ public class SplashScreen extends AppCompatActivity {
 
                 @Override
                 public void onCancel() {
-
+                    Log.e("facebook_error" , "cancelled");
                 }
 
                 @Override
                 public void onError(FacebookException error) {
-
                 }
             });
 
@@ -83,7 +84,7 @@ public class SplashScreen extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        API api = retrofit.create(API.class);
+        HowlApiClient api = retrofit.create(HowlApiClient.class);
         String accessToken = AccessToken.getCurrentAccessToken().getToken();
         api.login(accessToken).enqueue(new Callback<UserProfile>() {
             @Override
