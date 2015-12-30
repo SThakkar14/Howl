@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import boomer.com.howl.HowlApiClient;
 import boomer.com.howl.HTTPCodes;
 import boomer.com.howl.HowlApiClient;
 import boomer.com.howl.Objects.Howl;
@@ -140,13 +139,29 @@ public class HowlThread extends AppCompatActivity {
 
             api = retrofit.create(HowlApiClient.class);
         }
-        String accessToken = AccessToken.getCurrentAccessToken().toString();
+        String accessToken = AccessToken.getCurrentAccessToken().getToken();
         api.get_feed(accessToken, id).enqueue(new Callback<List<Howl>>() {
             @Override
             public void onResponse(Response<List<Howl>> response, Retrofit retrofit) {
                 if (response.code() == HTTPCodes.OK) {
                     comments = response.body();
+
+                    Collections.sort(comments, new Comparator<Howl>() {
+                        @Override
+                        public int compare(Howl lhs, Howl rhs) {
+                            if (lhs.getCreated() > rhs.getCreated())
+                                return 1;
+                            else if (lhs.getCreated() < rhs.getCreated())
+                                return -1;
+                            else
+                                return 0;
+                        }
+                    });
+
                     adapter.notifyDataSetChanged();
+                    recyclerView.scrollToPosition(comments.size() - 1);
+                } else {
+                    System.out.println("Not working");
                 }
             }
 
@@ -155,7 +170,6 @@ public class HowlThread extends AppCompatActivity {
 
             }
         });
-        recyclerView.scrollToPosition(comments.size() - 1);
     }
 
     public class howl_thread_adapter extends RecyclerView.Adapter<howl_thread_adapter.ViewHolder> {
