@@ -29,12 +29,15 @@
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-
         <activity
             android:name=".Activities.LandingPage"
             android:label="@string/title_activity_landing_page"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".Activities.HowlThread"></activity>
+        <activity android:name=".Activities.HowlThread" />
+        <activity
+            android:name=".Activities.NewHowl"
+            android:label="@string/title_activity_new_howl"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

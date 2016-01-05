@@ -4,9 +4,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="boomer.com.howl.Activities.HowlThread">
     <item
-        android:id="@+id/action_settings2"
+        android:id="@+id/follow"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:title="@string/follow"
+        android:icon="@drawable/ic_favorite_border_white_24dp"
         app:showAsAction="always"/>
+    <item
+        android:id="@+id/unfollow"
+        android:orderInCategory="100"
+        android:title="@string/unfollow"
+        android:icon="@drawable/ic_favorite_white_24dp"
+        app:showAsAction="never"/>
 
 </menu>

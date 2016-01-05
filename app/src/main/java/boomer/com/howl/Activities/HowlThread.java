@@ -32,6 +32,7 @@ import boomer.com.howl.HowlApiClient;
 import boomer.com.howl.Objects.Howl;
 import boomer.com.howl.Objects.HowlCommentBody;
 import boomer.com.howl.Objects.HowlCommentResponse;
+import boomer.com.howl.Objects.ResponseStatus;
 import boomer.com.howl.R;
 import boomer.howl.Constants;
 import retrofit.Call;
@@ -49,8 +50,8 @@ public class HowlThread extends AppCompatActivity {
     RecyclerView.Adapter adapter;
     List<Howl> comments;
     ProgressBar spinner;
-
     RecyclerView recyclerView;
+    Menu howlMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -185,18 +186,71 @@ public class HowlThread extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_howl_thread, menu);
+        this.howlMenu = menu;
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(final MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+        if(api == null){
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(API_URL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
 
+            api = retrofit.create(HowlApiClient.class);
+        }
+
+        final String accessToken = AccessToken.getCurrentAccessToken().getToken();
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings2) {
+        if (id == R.id.follow) {
+            api.follow_a_feed(accessToken, this.id).enqueue(new Callback<ResponseStatus>() {
+
+                @Override
+                public void onResponse(Response<ResponseStatus> response, Retrofit retrofit) {
+                    if (response.code() == HTTPCodes.OK) {
+                        //flipping the menuitem based on the response
+                        Log.i("follow_response",String.valueOf(response.code()));
+                        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+                        MenuItem unfollowItem = howlMenu.findItem(R.id.unfollow);
+                        unfollowItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                    } else {
+                        Log.e("onOptionsItemSelected()", String.valueOf(response.code()));
+                    }
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+
+                }
+            });
+            return true;
+        }
+        if (id == R.id.unfollow) {
+            api.unfollow_a_feed(accessToken, this.id).enqueue(new Callback<ResponseStatus>() {
+
+                @Override
+                public void onResponse(Response<ResponseStatus> response, Retrofit retrofit) {
+                    if (response.code() == HTTPCodes.OK) {
+                        //flipping the menuitem based on the response
+                        Log.i("follow_response",String.valueOf(response.code()));
+                        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+                        MenuItem followItem = howlMenu.findItem(R.id.follow);
+                        followItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                    } else {
+                        Log.e("onOptionsItemSelected()", String.valueOf(response.code()));
+                    }
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+
+                }
+            });
             return true;
         }
 
