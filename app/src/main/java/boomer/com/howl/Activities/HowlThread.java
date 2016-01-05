@@ -8,14 +8,15 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -25,8 +26,6 @@ import com.facebook.AccessToken;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import android.util.Log;
-
 
 import boomer.com.howl.HTTPCodes;
 import boomer.com.howl.HowlApiClient;
@@ -58,7 +57,7 @@ public class HowlThread extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_howl_thread);
 
-        spinner = (ProgressBar)findViewById(R.id.howls_loading);
+        spinner = (ProgressBar) findViewById(R.id.howls_loading);
         spinner.setVisibility(View.VISIBLE);
 
         recyclerView = (RecyclerView) findViewById(R.id.howl_thread_activity_recycler_view);
@@ -81,7 +80,7 @@ public class HowlThread extends AppCompatActivity {
 
 
         //Button button = (Button) findViewById(R.id.submitButton);
-        ImageButton commentOnAHowl = (ImageButton)findViewById(R.id.commentOnAHowl);
+        ImageButton commentOnAHowl = (ImageButton) findViewById(R.id.commentOnAHowl);
 
         commentOnAHowl.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -168,7 +167,7 @@ public class HowlThread extends AppCompatActivity {
         });
     }
 
-    private void sortComments(List<Howl> comments){
+    private void sortComments(List<Howl> comments) {
         Collections.sort(comments, new Comparator<Howl>() {
             @Override
             public int compare(Howl lhs, Howl rhs) {
@@ -180,6 +179,28 @@ public class HowlThread extends AppCompatActivity {
                     return 0;
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_howl_thread, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings2) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     public class howl_thread_adapter extends RecyclerView.Adapter<howl_thread_adapter.ViewHolder> {
