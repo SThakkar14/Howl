@@ -52,6 +52,7 @@ public class HowlThread extends AppCompatActivity {
     ProgressBar spinner;
     RecyclerView recyclerView;
     Menu howlMenu;
+    boolean following = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -186,6 +187,11 @@ public class HowlThread extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_howl_thread, menu);
+        if (following) {
+            menu.findItem(R.id.follow).setIcon(R.drawable.ic_star_white_24dp);
+        } else {
+            menu.findItem(R.id.follow).setIcon(R.drawable.ic_star_border_white_24dp);
+        }
         this.howlMenu = menu;
         return true;
     }
@@ -196,7 +202,7 @@ public class HowlThread extends AppCompatActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if(api == null){
+        if (api == null) {
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(API_URL)
                     .addConverterFactory(GsonConverterFactory.create())
@@ -208,51 +214,76 @@ public class HowlThread extends AppCompatActivity {
         final String accessToken = AccessToken.getCurrentAccessToken().getToken();
         //noinspection SimplifiableIfStatement
         if (id == R.id.follow) {
-            api.follow_a_feed(accessToken, this.id).enqueue(new Callback<ResponseStatus>() {
+            if (this.following) {
+                api.unfollow_a_feed(accessToken, this.id).enqueue(new Callback<ResponseStatus>() {
 
-                @Override
-                public void onResponse(Response<ResponseStatus> response, Retrofit retrofit) {
-                    if (response.code() == HTTPCodes.OK) {
-                        //flipping the menuitem based on the response
-                        Log.i("follow_response",String.valueOf(response.code()));
-                        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-                        MenuItem unfollowItem = howlMenu.findItem(R.id.unfollow);
-                        unfollowItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-                    } else {
-                        Log.e("onOptionsItemSelected()", String.valueOf(response.code()));
+                    @Override
+                    public void onResponse(Response<ResponseStatus> response, Retrofit retrofit) {
+                        if (response.code() == HTTPCodes.OK) {
+                            //flipping the menuitem based on the response
+                            Log.i("follow_response", "unfollow "+String.valueOf(response.code()));
+                            item.setIcon(R.drawable.ic_star_border_white_24dp);
+                            following = false;
+                        } else {
+                            Log.e("onOptionsItemSelected()", String.valueOf(response.code()));
+                        }
                     }
-                }
 
-                @Override
-                public void onFailure(Throwable t) {
+                    @Override
+                    public void onFailure(Throwable t) {
 
-                }
-            });
-            return true;
-        }
-        if (id == R.id.unfollow) {
-            api.unfollow_a_feed(accessToken, this.id).enqueue(new Callback<ResponseStatus>() {
-
-                @Override
-                public void onResponse(Response<ResponseStatus> response, Retrofit retrofit) {
-                    if (response.code() == HTTPCodes.OK) {
-                        //flipping the menuitem based on the response
-                        Log.i("follow_response",String.valueOf(response.code()));
-                        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-                        MenuItem followItem = howlMenu.findItem(R.id.follow);
-                        followItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-                    } else {
-                        Log.e("onOptionsItemSelected()", String.valueOf(response.code()));
                     }
-                }
+                });
+            } else {
+                api.follow_a_feed(accessToken, this.id).enqueue(new Callback<ResponseStatus>() {
 
-                @Override
-                public void onFailure(Throwable t) {
+                    @Override
+                    public void onResponse(Response<ResponseStatus> response, Retrofit retrofit) {
+                        if (response.code() == HTTPCodes.OK) {
+                            //flipping the menuitem based on the response
+                            Log.i("follow_response", "follow "+String.valueOf(response.code()));
+                            item.setIcon(R.drawable.ic_star_white_24dp);
+                            following = true;
+                        } else {
+                            Log.e("onOptionsItemSelected()", String.valueOf(response.code()));
+                        }
+                    }
 
-                }
-            });
+                    @Override
+                    public void onFailure(Throwable t) {
+
+                    }
+                });
+            }
             return true;
+
+
         }
+//        if (id == R.id.unfollow) {
+//            api.unfollow_a_feed(accessToken, this.id).enqueue(new Callback<ResponseStatus>() {
+//
+//                @Override
+//                public void onResponse(Response<ResponseStatus> response, Retrofit retrofit) {
+//                    if (response.code() == HTTPCodes.OK) {
+//                        //flipping the menuitem based on the response
+////                        Log.i("follow_response",String.valueOf(response.code()));
+//                        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+//                        //item.setVisible(false);
+//                        MenuItem followItem = howlMenu.findItem(R.id.follow);
+//                        followItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+////                        followItem.setVisible(true);
+//                    } else {
+//                        Log.e("onOptionsItemSelected()", String.valueOf(response.code()));
+//                    }
+//                }
+//
+//                @Override
+//                public void onFailure(Throwable t) {
+//
+//                }
+//            });
+//            return true;
+//        }
 
         return super.onOptionsItemSelected(item);
     }
