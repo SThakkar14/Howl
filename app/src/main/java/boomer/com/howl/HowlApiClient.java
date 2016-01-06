@@ -7,7 +7,6 @@ import boomer.com.howl.Objects.HowlCommentBody;
 import boomer.com.howl.Objects.HowlCommentResponse;
 import boomer.com.howl.Objects.ResponseStatus;
 import boomer.com.howl.Objects.UserProfile;
-import boomer.howl.Constants;
 import retrofit.Call;
 import retrofit.http.Body;
 import retrofit.http.DELETE;

@@ -9,11 +9,5 @@
         android:title="@string/follow"
         android:icon="@drawable/ic_star_border_white_24dp"
         app:showAsAction="always"/>
-    <!--<item-->
-        <!--android:id="@+id/unfollow"-->
-        <!--android:orderInCategory="100"-->
-        <!--android:title="@string/unfollow"-->
-        <!--android:icon="@drawable/ic_star_white_24dp"-->
-        <!--app:showAsAction="never"/>-->
 
 </menu>
