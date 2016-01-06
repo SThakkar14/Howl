@@ -79,7 +79,7 @@ public class HowlThread extends AppCompatActivity {
         this.id = intent.getStringExtra("id");
         this.zipcode = intent.getStringExtra("zipcode");
         this.user_id = intent.getStringExtra("user_id");
-
+        this.following = (boolean) intent.getBooleanExtra("following" , false);
 
         //Button button = (Button) findViewById(R.id.submitButton);
         ImageButton commentOnAHowl = (ImageButton) findViewById(R.id.commentOnAHowl);
@@ -221,7 +221,7 @@ public class HowlThread extends AppCompatActivity {
                     public void onResponse(Response<ResponseStatus> response, Retrofit retrofit) {
                         if (response.code() == HTTPCodes.OK) {
                             //flipping the menuitem based on the response
-                            Log.i("follow_response", "unfollow "+String.valueOf(response.code()));
+//                            Log.i("follow_response", "unfollow "+String.valueOf(response.code()));
                             item.setIcon(R.drawable.ic_star_border_white_24dp);
                             following = false;
                         } else {
@@ -241,7 +241,7 @@ public class HowlThread extends AppCompatActivity {
                     public void onResponse(Response<ResponseStatus> response, Retrofit retrofit) {
                         if (response.code() == HTTPCodes.OK) {
                             //flipping the menuitem based on the response
-                            Log.i("follow_response", "follow "+String.valueOf(response.code()));
+//                            Log.i("follow_response", "follow "+String.valueOf(response.code()));
                             item.setIcon(R.drawable.ic_star_white_24dp);
                             following = true;
                         } else {

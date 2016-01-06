@@ -11,12 +11,15 @@ public class Howl implements Serializable {
     String user_id;
     long created;
     String type;
+    boolean following = false;
 
     public Howl() {
 
     }
 
-    public Howl(String id, String comment_id, int parent, String zipcode, HowlAttributes attributes, String user_id, long created, String type) {
+
+
+    public Howl(String id, String comment_id, int parent, String zipcode, HowlAttributes attributes, String user_id, long created, String type , boolean following) {
         this.id = id;
         this.comment_id = comment_id;
         this.parent = parent;
@@ -25,6 +28,7 @@ public class Howl implements Serializable {
         this.user_id = user_id;
         this.created = created;
         this.type = type;
+        this.setFollowing(following);
     }
 
     public String getId() {
@@ -91,6 +95,14 @@ public class Howl implements Serializable {
         this.type = type;
     }
 
+    public boolean isFollowing() {
+        return following;
+    }
+
+    public void setFollowing(boolean following) {
+        this.following = following;
+    }
+
     @Override
     public String toString() {
         return "Howl{" +
@@ -102,6 +114,7 @@ public class Howl implements Serializable {
                 ", user_id='" + user_id + '\'' +
                 ", created=" + created +
                 ", type='" + type + '\'' +
+                ", following=" + following +
                 '}';
     }
 }
