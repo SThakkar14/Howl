@@ -21,12 +21,11 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
-import boomer.com.howl.HowlApiClient;
+import boomer.com.howl.Constants;
 import boomer.com.howl.HTTPCodes;
 import boomer.com.howl.HowlApiClient;
 import boomer.com.howl.Objects.UserProfile;
 import boomer.com.howl.R;
-import boomer.howl.Constants;
 import retrofit.Callback;
 import retrofit.GsonConverterFactory;
 import retrofit.Response;
@@ -56,7 +55,7 @@ public class SplashScreen extends AppCompatActivity {
 
                 @Override
                 public void onCancel() {
-                    Log.e("facebook_error" , "cancelled");
+                    Log.e("facebook_error", "cancelled");
                 }
 
                 @Override

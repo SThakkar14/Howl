@@ -15,14 +15,13 @@ import com.facebook.AccessToken;
 
 import java.util.List;
 
-import boomer.com.howl.HowlApiClient;
 import boomer.com.howl.Activities.HowlThread;
+import boomer.com.howl.Constants;
 import boomer.com.howl.HTTPCodes;
 import boomer.com.howl.HowlApiClient;
 import boomer.com.howl.Objects.Howl;
 import boomer.com.howl.Objects.UserProfile;
 import boomer.com.howl.R;
-import boomer.howl.Constants;
 import retrofit.Callback;
 import retrofit.GsonConverterFactory;
 import retrofit.Response;
@@ -139,7 +138,6 @@ public class HowlsFragment extends Fragment {
                         Intent intent = new Intent(v.getContext(), HowlThread.class);
                         intent.putExtra("user_id", userProfile.getId());
                         intent.putExtra("id", howl.getId());
-                        intent.putExtra("following" , howl.isFollowing());
                         intent.putExtra("zipcode", howl.getZipcode());
                         startActivity(intent);
                     }

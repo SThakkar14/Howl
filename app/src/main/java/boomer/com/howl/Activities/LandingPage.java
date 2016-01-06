@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import boomer.com.howl.Fragments.HowlsFragment;
 import boomer.com.howl.Fragments.OtherFragment;
+import boomer.com.howl.Fragments.ProfileFragment;
 import boomer.com.howl.Objects.UserProfile;
 import boomer.com.howl.R;
 
@@ -112,16 +113,24 @@ public class LandingPage extends AppCompatActivity {
         @Override
         public Fragment getItem(int position) {
 
-            if (position == 0) {
-                if (fragments[0] == null) {
-                    fragments[0] = HowlsFragment.newInstance(initialProfile);
-                }
-                return fragments[0];
-            } else if (position == 3) {
-                if (fragments[3] == null) {
-                    fragments[3] = new OtherFragment();
-                }
-                return fragments[3];
+            switch (position) {
+                case 0:
+                    if (fragments[0] == null) {
+                        fragments[0] = HowlsFragment.newInstance(initialProfile);
+                    }
+                    return fragments[0];
+
+                case 2:
+                    if (fragments[2] == null) {
+                        fragments[2] = ProfileFragment.newInstance("asdf", "asdf");
+                    }
+                    return fragments[2];
+
+                case 3:
+                    if (fragments[3] == null) {
+                        fragments[3] = new OtherFragment();
+                    }
+                    return fragments[3];
             }
             return PlaceholderFragment.newInstance(position + 1);
         }

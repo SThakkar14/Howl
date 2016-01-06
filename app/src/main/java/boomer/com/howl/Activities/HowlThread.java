@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import boomer.com.howl.Constants;
 import boomer.com.howl.HTTPCodes;
 import boomer.com.howl.HowlApiClient;
 import boomer.com.howl.Objects.Howl;
@@ -34,7 +35,6 @@ import boomer.com.howl.Objects.HowlCommentBody;
 import boomer.com.howl.Objects.HowlCommentResponse;
 import boomer.com.howl.Objects.ResponseStatus;
 import boomer.com.howl.R;
-import boomer.howl.Constants;
 import retrofit.Call;
 import retrofit.Callback;
 import retrofit.GsonConverterFactory;
@@ -51,8 +51,8 @@ public class HowlThread extends AppCompatActivity {
     List<Howl> comments;
     ProgressBar spinner;
     RecyclerView recyclerView;
-    Menu howlMenu;
-    boolean following = false;
+    boolean following ;
+    Menu currentMenuBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,9 +79,8 @@ public class HowlThread extends AppCompatActivity {
         this.id = intent.getStringExtra("id");
         this.zipcode = intent.getStringExtra("zipcode");
         this.user_id = intent.getStringExtra("user_id");
-        this.following = (boolean) intent.getBooleanExtra("following" , false);
+        //this.following = (boolean) intent.getBooleanExtra("following" , false);
 
-        //Button button = (Button) findViewById(R.id.submitButton);
         ImageButton commentOnAHowl = (ImageButton) findViewById(R.id.commentOnAHowl);
 
         commentOnAHowl.setOnClickListener(new View.OnClickListener() {
@@ -121,7 +120,18 @@ public class HowlThread extends AppCompatActivity {
                 comments = response.body();
 
                 sortComments(comments);
-
+                //Getting the first howl
+                if(comments.get(0) != null && comments.get(0).getParent() ==1){
+                    Log.i("isFollowing","OnCreate() "+comments.get(0).isFollowing());
+                    following = comments.get(0).isFollowing();
+                    if (following) {
+                        Log.i("isFollowing" , "onCreateOptionsMenu() Its a full star");
+                        currentMenuBar.findItem(R.id.follow).setIcon(R.drawable.ic_star_white_24dp);
+                    } else {
+                        Log.i("isFollowing" , "onCreateOptionsMenu() Its a border star");
+                        currentMenuBar.findItem(R.id.follow).setIcon(R.drawable.ic_star_border_white_24dp);
+                    }
+                }
                 adapter = new howl_thread_adapter();
                 recyclerView.setAdapter(adapter);
                 recyclerView.scrollToPosition(comments.size() - 1);
@@ -154,7 +164,10 @@ public class HowlThread extends AppCompatActivity {
                     comments = response.body();
 
                     sortComments(comments);
-
+//                    //Getting the first howl
+//                    if(comments.get(0) != null && comments.get(0).getParent() ==1){
+//                        following = comments.get(0).isFollowing();
+//                    }
                     adapter.notifyDataSetChanged();
                     recyclerView.scrollToPosition(comments.size() - 1);
                 } else {
@@ -187,12 +200,8 @@ public class HowlThread extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_howl_thread, menu);
-        if (following) {
-            menu.findItem(R.id.follow).setIcon(R.drawable.ic_star_white_24dp);
-        } else {
-            menu.findItem(R.id.follow).setIcon(R.drawable.ic_star_border_white_24dp);
-        }
-        this.howlMenu = menu;
+        this.currentMenuBar = menu;
+
         return true;
     }
 
@@ -241,7 +250,7 @@ public class HowlThread extends AppCompatActivity {
                     public void onResponse(Response<ResponseStatus> response, Retrofit retrofit) {
                         if (response.code() == HTTPCodes.OK) {
                             //flipping the menuitem based on the response
-//                            Log.i("follow_response", "follow "+String.valueOf(response.code()));
+
                             item.setIcon(R.drawable.ic_star_white_24dp);
                             following = true;
                         } else {
@@ -256,35 +265,7 @@ public class HowlThread extends AppCompatActivity {
                 });
             }
             return true;
-
-
         }
-//        if (id == R.id.unfollow) {
-//            api.unfollow_a_feed(accessToken, this.id).enqueue(new Callback<ResponseStatus>() {
-//
-//                @Override
-//                public void onResponse(Response<ResponseStatus> response, Retrofit retrofit) {
-//                    if (response.code() == HTTPCodes.OK) {
-//                        //flipping the menuitem based on the response
-////                        Log.i("follow_response",String.valueOf(response.code()));
-//                        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-//                        //item.setVisible(false);
-//                        MenuItem followItem = howlMenu.findItem(R.id.follow);
-//                        followItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-////                        followItem.setVisible(true);
-//                    } else {
-//                        Log.e("onOptionsItemSelected()", String.valueOf(response.code()));
-//                    }
-//                }
-//
-//                @Override
-//                public void onFailure(Throwable t) {
-//
-//                }
-//            });
-//            return true;
-//        }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -324,7 +305,6 @@ public class HowlThread extends AppCompatActivity {
         @Override
         public void onBindViewHolder(howl_thread_adapter.ViewHolder holder, int position) {
             String thing = comments.get(position).getAttributes().getMessage();
-            //String thing = comments.get(position).toString();
             holder.card_view_textview.setText(thing);
         }
 
