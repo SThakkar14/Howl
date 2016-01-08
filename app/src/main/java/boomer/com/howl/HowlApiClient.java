@@ -41,4 +41,8 @@ public interface HowlApiClient {
     @Headers(Constants.CONTENT_TYPE)
     @DELETE("/api/v1/howls/{id}/follow")
     Call<ResponseStatus> unfollow_a_feed(@Header("x-token") String token, @Path("id") String id);
+
+    @Headers(Constants.CONTENT_TYPE)
+    @GET("/api/v1/follow")
+    Call<List<Howl>> get_following_feeds(@Header("x-token") String token);
 }
