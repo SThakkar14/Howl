@@ -43,7 +43,6 @@ import retrofit.Retrofit;
 
 public class HowlThread extends AppCompatActivity {
     public static final String API_URL = "http://pethowl.com";
-    String zipcode;
     String id;
     String user_id;
     HowlApiClient api;
@@ -77,7 +76,6 @@ public class HowlThread extends AppCompatActivity {
 
         Intent intent = getIntent();
         this.id = intent.getStringExtra("id");
-        this.zipcode = intent.getStringExtra("zipcode");
         this.user_id = intent.getStringExtra("user_id");
         //this.following = (boolean) intent.getBooleanExtra("following" , false);
 
@@ -90,7 +88,7 @@ public class HowlThread extends AppCompatActivity {
                 String text = editText.getText().toString();
                 spinner.setVisibility(View.VISIBLE);
 
-                HowlCommentBody hcb = new HowlCommentBody(zipcode, text);
+                HowlCommentBody hcb = new HowlCommentBody(null, text);
                 Call<HowlCommentResponse> commentResponse = api.post_comment(accessToken, id, hcb);
                 commentResponse.enqueue(new Callback<HowlCommentResponse>() {
                     @Override
@@ -125,10 +123,10 @@ public class HowlThread extends AppCompatActivity {
                     Log.i("isFollowing","OnCreate() "+comments.get(0).isFollowing());
                     following = comments.get(0).isFollowing();
                     if (following) {
-                        Log.i("isFollowing" , "onCreateOptionsMenu() Its a full star");
+//                        Log.i("isFollowing" , "onCreateOptionsMenu() Its a full star");
                         currentMenuBar.findItem(R.id.follow).setIcon(R.drawable.ic_star_white_24dp);
                     } else {
-                        Log.i("isFollowing" , "onCreateOptionsMenu() Its a border star");
+//                        Log.i("isFollowing" , "onCreateOptionsMenu() Its a border star");
                         currentMenuBar.findItem(R.id.follow).setIcon(R.drawable.ic_star_border_white_24dp);
                     }
                 }

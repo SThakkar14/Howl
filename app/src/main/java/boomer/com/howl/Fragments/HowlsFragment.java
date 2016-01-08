@@ -138,7 +138,6 @@ public class HowlsFragment extends Fragment {
                         Intent intent = new Intent(v.getContext(), HowlThread.class);
                         intent.putExtra("user_id", userProfile.getId());
                         intent.putExtra("id", howl.getId());
-                        intent.putExtra("zipcode", howl.getZipcode());
                         startActivity(intent);
                     }
                 });
