@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.facebook.AccessToken;
 
+import java.io.Serializable;
 import java.util.List;
 
 import boomer.com.howl.Activities.HowlThread;
@@ -32,7 +33,7 @@ public class HowlsFragment extends Fragment {
     List<Howl> howls;
     HowlApiClient api;
     RecyclerView.Adapter adapter;
-
+    String userId;
     public HowlsFragment() {
         // Required empty public constructor
     }
@@ -45,14 +46,24 @@ public class HowlsFragment extends Fragment {
         return fragment;
     }
 
+    public static HowlsFragment newInstance(List<Howl> howls , String userId) {
+        HowlsFragment fragment = new HowlsFragment();
+        Bundle args = new Bundle();
+        args.putSerializable("HOWLS", (Serializable) howls);
+        args.putString("userId" , userId);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            userProfile = (UserProfile) getArguments().getSerializable("HOWLS");
-            if (userProfile != null) {
-                howls = userProfile.getHowls();
-            }
+            howls = (List<Howl>) getArguments().getSerializable("HOWLS");
+            userId = getArguments().getString("userId");
+//            if (userProfile != null) {
+//                howls = userProfile.getHowls();
+//            }
         }
     }
 
@@ -136,7 +147,7 @@ public class HowlsFragment extends Fragment {
                         Howl howl = howls.get(getAdapterPosition());
 
                         Intent intent = new Intent(v.getContext(), HowlThread.class);
-                        intent.putExtra("user_id", userProfile.getId());
+                        intent.putExtra("user_id", userId);
                         intent.putExtra("id", howl.getId());
                         startActivity(intent);
                     }
