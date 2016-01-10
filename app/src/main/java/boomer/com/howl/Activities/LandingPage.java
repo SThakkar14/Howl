@@ -117,9 +117,7 @@ public class LandingPage extends AppCompatActivity {
 
             switch (position) {
                 case 0:
-                    if (fragments[0] == null) {
-                        fragments[0] = HowlsFragment.newInstance(initialProfile.getHowls(), initialProfile.getId());
-                    }
+                    fragments[0] = new HowlsFragment(initialProfile.getId());
                     return fragments[0];
                 case 1:
                     fragments[1] = new FollowingFragment(initialProfile.getId());
