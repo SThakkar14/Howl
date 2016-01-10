@@ -9,7 +9,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,31 +16,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.facebook.AccessToken;
-
-import java.io.IOException;
-import java.util.List;
-
-import boomer.com.howl.Constants;
+import boomer.com.howl.Fragments.FollowingFragment;
 import boomer.com.howl.Fragments.HowlsFragment;
 import boomer.com.howl.Fragments.OtherFragment;
 import boomer.com.howl.Fragments.ProfileFragment;
-import boomer.com.howl.HTTPCodes;
-import boomer.com.howl.HowlApiClient;
-import boomer.com.howl.Objects.Howl;
-import boomer.com.howl.Objects.ResponseStatus;
 import boomer.com.howl.Objects.UserProfile;
 import boomer.com.howl.R;
-import retrofit.Call;
-import retrofit.Callback;
-import retrofit.GsonConverterFactory;
-import retrofit.Response;
-import retrofit.Retrofit;
 
 public class LandingPage extends AppCompatActivity {
 
     UserProfile initialProfile;
-    HowlApiClient api;
 
 
     @Override
@@ -134,47 +118,12 @@ public class LandingPage extends AppCompatActivity {
             switch (position) {
                 case 0:
                     if (fragments[0] == null) {
-                        fragments[0] = HowlsFragment.newInstance(initialProfile.getHowls(),initialProfile.getId());
-//                        fragments[0] = HowlsFragment.newInstance(initialProfile);
+                        fragments[0] = HowlsFragment.newInstance(initialProfile.getHowls(), initialProfile.getId());
                     }
                     return fragments[0];
                 case 1:
-                    if (fragments[1] == null) {
-//                        Retrofit retrofit = new Retrofit.Builder()
-//                                .baseUrl(Constants.BASE_URL)
-//                                .addConverterFactory(GsonConverterFactory.create())
-//                                .build();
-//
-//                        api = retrofit.create(HowlApiClient.class);
-//                        final String accessToken = AccessToken.getCurrentAccessToken().getToken();
-//
-//                        api.get_following_feeds(accessToken).enqueue(new Callback<List<Howl>>() {
-//
-//                            @Override
-//                            public void onResponse(Response<List<Howl>> response, Retrofit retrofit) {
-//                                if (response.code() == HTTPCodes.OK) {
-//                                    List<Howl> howls = response.body();
-//                                    Log.i("followedHowls" , ""+howls.size());
-//                                    fragments[1] = HowlsFragment.newInstance(howls,initialProfile.getId());
-//
-//                                } else {
-//                                    Log.e("updateComments()", String.valueOf(response.code()));
-//                                }
-//                            }
-//
-//                            @Override
-//                            public void onFailure(Throwable t) {
-//
-//                            }
-//
-//                        });
-
-                        fragments[1] = HowlsFragment.newInstance(initialProfile.getHowls(),initialProfile.getId());
-                    }
-                    Log.i("followedHowls" , ""+fragments[1]);
+                    fragments[1] = new FollowingFragment(initialProfile.getId());
                     return fragments[1];
-
-
                 case 2:
                     if (fragments[2] == null) {
                         fragments[2] = ProfileFragment.newInstance("asdf", "asdf");

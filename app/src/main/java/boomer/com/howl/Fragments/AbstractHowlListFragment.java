@@ -11,69 +11,37 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.facebook.AccessToken;
-
-import java.io.Serializable;
 import java.util.List;
 
 import boomer.com.howl.Activities.HowlThread;
-import boomer.com.howl.Constants;
-import boomer.com.howl.HTTPCodes;
-import boomer.com.howl.HowlApiClient;
 import boomer.com.howl.Objects.Howl;
-import boomer.com.howl.Objects.UserProfile;
 import boomer.com.howl.R;
-import retrofit.Callback;
-import retrofit.GsonConverterFactory;
-import retrofit.Response;
-import retrofit.Retrofit;
 
-public class HowlsFragment extends Fragment {
-    List<Howl> howls;
-    HowlApiClient api;
-    RecyclerView.Adapter adapter;
-    String userId;
+abstract public class AbstractHowlListFragment extends Fragment {
+    protected List<Howl> howls;
+    protected String userId;
+    protected RecyclerView.Adapter adapter;
 
-    public HowlsFragment() {
+
+    public AbstractHowlListFragment() {
         // Required empty public constructor
     }
 
-    public static HowlsFragment newInstance(UserProfile userProfile) {
-        HowlsFragment fragment = new HowlsFragment();
-        Bundle args = new Bundle();
-        args.putSerializable("HOWLS", userProfile);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    public static HowlsFragment newInstance(List<Howl> howls, String userId) {
-        HowlsFragment fragment = new HowlsFragment();
-        Bundle args = new Bundle();
-        args.putSerializable("HOWLS", (Serializable) howls);
-        args.putString("userId", userId);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    abstract public void getHowls();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            howls = (List<Howl>) getArguments().getSerializable("HOWLS");
-            userId = getArguments().getString("userId");
-//            if (userProfile != null) {
-//                howls = userProfile.getHowls();
-//            }
-        }
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_howls, container, false);
+        View v = inflater.inflate(R.layout.fragment_abstract_howl_list, container, false);
 
-        RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.howl_fragment_recycler_view);
+        RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.abstract_howl_list_recycler_view);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
@@ -81,35 +49,9 @@ public class HowlsFragment extends Fragment {
         adapter = new howl_adapter();
         recyclerView.setAdapter(adapter);
 
+        getHowls();
+
         return v;
-    }
-
-    public void updateHowls() {
-        if (api == null) {
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(Constants.BASE_URL)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
-
-            api = retrofit.create(HowlApiClient.class);
-        }
-
-        String accessToken = AccessToken.getCurrentAccessToken().getToken();
-        api.get_howls(accessToken).enqueue(new Callback<List<Howl>>() {
-            @Override
-            public void onResponse(Response<List<Howl>> response, Retrofit retrofit) {
-                if (response.code() == HTTPCodes.OK) {
-                    howls = response.body();
-                    adapter.notifyDataSetChanged();
-                }
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-
-            }
-        });
-
     }
 
     public class howl_adapter extends RecyclerView.Adapter<howl_adapter.ViewHolder> {
@@ -129,6 +71,8 @@ public class HowlsFragment extends Fragment {
 
         @Override
         public int getItemCount() {
+            if (howls == null)
+                return 0;
             return howls.size();
         }
 
