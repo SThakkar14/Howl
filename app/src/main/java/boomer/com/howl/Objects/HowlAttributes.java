@@ -7,6 +7,16 @@ import boomer.com.howl.Objects.Pet;
 public class HowlAttributes  implements Serializable {
     String message;
     Pet pet;
+    String image;
+
+    @Override
+    public String toString() {
+        return "HowlAttributes{" +
+                "message='" + message + '\'' +
+                ", pet=" + pet +
+                ", imageUrl='" + image + '\'' +
+                '}';
+    }
 
     public HowlAttributes() {
 
@@ -33,11 +43,11 @@ public class HowlAttributes  implements Serializable {
         this.pet = pet;
     }
 
-    @Override
-    public String toString() {
-        return "HowlAttributes{" +
-                "message='" + message + '\'' +
-                ", pet=" + pet +
-                '}';
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

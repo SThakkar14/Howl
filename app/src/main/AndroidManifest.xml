@@ -3,6 +3,11 @@
     package="boomer.com.howl">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <uses-feature android:name="android.hardware.camera" />
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -37,7 +42,12 @@
         <activity
             android:name=".Activities.NewHowl"
             android:label="@string/title_activity_new_howl"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <service
+            android:name=".Services.ImageCaptureService"
+            android:exported="false" />
+
     </application>
 
 </manifest>

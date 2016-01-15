@@ -20,6 +20,9 @@ public class HowlsFragment extends AbstractHowlListFragment {
     public HowlsFragment(String userId) {
         this.userId = userId;
     }
+    public HowlsFragment(){
+
+    }
 
     @Override
     public void getHowls() {
