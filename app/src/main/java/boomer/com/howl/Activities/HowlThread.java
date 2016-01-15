@@ -1,17 +1,22 @@
 package boomer.com.howl.Activities;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -23,10 +28,12 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -39,11 +46,9 @@ import com.squareup.okhttp.RequestBody;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.net.URI;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 
 import boomer.com.howl.Constants;
@@ -55,8 +60,6 @@ import boomer.com.howl.Objects.HowlCommentResponse;
 import boomer.com.howl.Objects.ResponseStatus;
 import boomer.com.howl.R;
 import boomer.com.howl.Services.AlbumStorageDirFactory;
-import boomer.com.howl.Services.BaseAlbumDirFactory;
-import boomer.com.howl.Services.FroyoAlbumDirFactory;
 import boomer.com.howl.Services.ImageCaptureService;
 import retrofit.Call;
 import retrofit.Callback;
@@ -76,12 +79,17 @@ public class HowlThread extends AppCompatActivity {
     boolean following ;
     Menu currentMenuBar;
     private static final int ACTION_TAKE_PHOTO_B = 1;
+    private static final int PICK_IMAGE_REQUEST = 2;
+
     private String mCurrentPhotoPath;
     private static final String JPEG_FILE_PREFIX = "IMG_HOWL_";
     private static final String JPEG_FILE_SUFFIX = ".jpg";
     private AlbumStorageDirFactory mAlbumStorageDirFactory = null;
     private ImageView mImageView;
     public  PhotoReadyReceiver receiver;
+
+    private Animator mCurrentAnimator;
+    private int mShortAnimationDuration;
 
 
 
@@ -109,29 +117,47 @@ public class HowlThread extends AppCompatActivity {
         Intent intent = getIntent();
         this.id = intent.getStringExtra("id");
         this.user_id = intent.getStringExtra("user_id");
+        //TODO: Framelayout for showing different attachment options
         //this.following = (boolean) intent.getBooleanExtra("following" , false);
+//        ImageButton showAttachmentOptionsLayout =(ImageButton) findViewById(R.id.showAttachmentLayout);
+//        showAttachmentOptionsLayout.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                FrameLayout attachmentOptionsLayout = (FrameLayout) findViewById(R.id.attachmentOptions);
+//                attachmentOptionsLayout.setVisibility(View.VISIBLE);
+//            }
+//        });
 
         ImageButton commentOnAHowl = (ImageButton) findViewById(R.id.commentOnAHowl);
         ImageButton takeAPicture = (ImageButton) findViewById(R.id.takePicture);
         mImageView = (ImageView) findViewById(R.id.imageView1);
 
-        /**
-         * Below is the code to register the photoreadyreceiver which would receive stuff
-         * from ImageCaptureService on completion
-         */
-//        IntentFilter filter = new IntentFilter(PhotoReadyReceiver.ACTION_RESP);
-//        filter.addCategory(Intent.CATEGORY_DEFAULT);
-        receiver = new PhotoReadyReceiver();
-//        registerReceiver(receiver,filter);
 
+        receiver = new PhotoReadyReceiver();
         setBtnListenerOrDisable(
                 takeAPicture,
                 mTakePicOnClickListener,
                 MediaStore.ACTION_IMAGE_CAPTURE
         );
 
+        /**
+         * Below code is to handle pickApicture button
+         */
+        ImageButton pickAPicture = (ImageButton) findViewById(R.id.pickAPicture);
+        pickAPicture.setOnClickListener(new OnClickListener() {
 
-        commentOnAHowl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                // Show only images, no videos or anything else
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                // Always show the chooser (if there are multiple options available)
+                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+            }
+        });
+
+        commentOnAHowl.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 final EditText editText = (EditText) findViewById(R.id.editText);
@@ -193,8 +219,8 @@ public class HowlThread extends AppCompatActivity {
 
     }
 
-    Button.OnClickListener mTakePicOnClickListener =
-            new Button.OnClickListener() {
+    OnClickListener mTakePicOnClickListener =
+            new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     dispatchTakePictureIntent(ACTION_TAKE_PHOTO_B);
@@ -238,7 +264,7 @@ public class HowlThread extends AppCompatActivity {
 
     private void setBtnListenerOrDisable(
             ImageButton btn,
-            Button.OnClickListener onClickListener,
+            OnClickListener onClickListener,
             String intentName
     ) {
         if (isIntentAvailable(this, intentName)) {
@@ -257,13 +283,36 @@ public class HowlThread extends AppCompatActivity {
                 }
                 break;
             }
-//            case ACTION_TAKE_PHOTO_S: {
-//                if (resultCode == RESULT_OK) {
-//                    handleSmallCameraPhoto(data);
-//                }
-//                break;
-//            } // ACTION_TAKE_PHOTO_S
+            case PICK_IMAGE_REQUEST: {
+                if (resultCode == RESULT_OK &&
+                        data != null && data.getData() != null) {
+
+                    Uri uri = data.getData();
+                    //TODO: need to handle the pickImage. Currently the URI does not give the right file path
+//                    Log.i("AttachPhoto" , uri.getPath());
+//                    Log.i("AttachPhoto" , uri.getEncodedPath());
+
+//                    Log.i("AttachPhoto","file path from URI : "+ getRealPathFromURI(uri));
+//                    File fileSelected = new File(getRealPathFromURI(uri));
+//                    postPictureToTheServer(fileSelected);
+                }
+                break;
+            } // ACTION_TAKE_PHOTO_S
         } // switch
+    }
+
+    private String getRealPathFromURI(Uri contentUri)
+    {
+        String[] proj = { MediaStore.Images.Media.DATA };
+        //Cursor cursor = managedQuery(contentUri, proj, null, null, null);
+        Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
+        cursor.moveToFirst();
+
+        int columnIndex = cursor.getColumnIndex(proj[0]);
+        String picturePath = cursor.getString(columnIndex); // returns null
+        cursor.close();
+        Log.i("AttachPhoto" , "getRealPathFromURI : "+picturePath);
+        return picturePath;
     }
 
     @Override
@@ -287,14 +336,14 @@ public class HowlThread extends AppCompatActivity {
 
     private void handleBigCameraPhoto() {
         if (mCurrentPhotoPath != null) {
-            setPic();
+            resizeAttachAndSendThePictureToTheServer();
             galleryAddPic();
             mCurrentPhotoPath = null;
         }
 
     }
 
-    private void setPic() {
+    private void resizeAttachAndSendThePictureToTheServer() {
 
 		/* There isn't enough memory to open up more than a couple camera photos */
 		/* So pre-scale the target bitmap into which the file is decoded */
@@ -323,6 +372,12 @@ public class HowlThread extends AppCompatActivity {
 
 		/* Decode the JPEG file into a Bitmap */
         Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+
+        File file = new File(mCurrentPhotoPath);
+        postPictureToTheServer(file);
+    }
+
+    private void postPictureToTheServer(File file){
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(API_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -331,7 +386,6 @@ public class HowlThread extends AppCompatActivity {
         api = retrofit.create(HowlApiClient.class);
         final String accessToken = AccessToken.getCurrentAccessToken().getToken();
         String description = "hello, this is description speaking";
-        File file = new File(mCurrentPhotoPath);
         RequestBody requestBody =
                 RequestBody.create(MediaType.parse("image/jpeg"), file);
         Call<ResponseStatus> howlCommentWithAnAttachment = api.post_comment_with_attachment(accessToken,this.id , requestBody, description);
@@ -518,8 +572,14 @@ public class HowlThread extends AppCompatActivity {
         @Override
         public void onBindViewHolder(howl_thread_adapter.ViewHolder holder, int position) {
             String thing = comments.get(position).getAttributes().getMessage();
-            String imageAttachmentUrl = comments.get(position).getAttributes().getImage();
+            final String imageAttachmentUrl = comments.get(position).getAttributes().getImage();
             if(imageAttachmentUrl != null){
+                holder.card_image_attachment.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        zoomImageOnClick(v , imageAttachmentUrl);
+                    }
+                });
                 holder.card_image_attachment.setVisibility(View.VISIBLE);
                 Picasso.with(getBaseContext())
                         .load(imageAttachmentUrl)
@@ -546,6 +606,136 @@ public class HowlThread extends AppCompatActivity {
                 card_view_textview = (TextView) itemView.findViewById(R.id.card_view_textview);
                 card_image_attachment = (ImageView) itemView.findViewById(R.id.card_image_attachment);
             }
+        }
+
+        private void zoomImageOnClick(final View imageView, String imageUrl) {
+            // If there's an animation in progress, cancel it immediately and proceed with this one.
+            if (mCurrentAnimator != null) {
+                mCurrentAnimator.cancel();
+            }
+
+            // Load the high-resolution "zoomed-in" image.
+            final ImageView expandedImageView = (ImageView) findViewById(R.id.expanded_image);
+//            expandedImageView.setImageResource(imageResId);
+            Picasso.with(getBaseContext())
+                    .load(imageUrl)
+                    .rotate(90)
+                    .into(expandedImageView);
+
+            // Calculate the starting and ending bounds for the zoomed-in image. This step
+            // involves lots of math. Yay, math.
+            final Rect startBounds = new Rect();
+            final Rect finalBounds = new Rect();
+            final Point globalOffset = new Point();
+
+            // The start bounds are the global visible rectangle of the thumbnail, and the
+            // final bounds are the global visible rectangle of the container view. Also
+            // set the container view's offset as the origin for the bounds, since that's
+            // the origin for the positioning animation properties (X, Y).
+
+            imageView.getGlobalVisibleRect(startBounds);
+            findViewById(R.id.card_view).getGlobalVisibleRect(finalBounds, globalOffset);
+            startBounds.offset(-globalOffset.x, -globalOffset.y);
+            finalBounds.offset(-globalOffset.x, -globalOffset.y);
+
+            // Adjust the start bounds to be the same aspect ratio as the final bounds using the
+            // "center crop" technique. This prevents undesirable stretching during the animation.
+            // Also calculate the start scaling factor (the end scaling factor is always 1.0).
+            float startScale;
+            if ((float) finalBounds.width() / finalBounds.height()
+                    > (float) startBounds.width() / startBounds.height()) {
+                // Extend start bounds horizontally
+                startScale = (float) startBounds.height() / finalBounds.height();
+                float startWidth = startScale * finalBounds.width();
+                float deltaWidth = (startWidth - startBounds.width()) / 2;
+                startBounds.left -= deltaWidth;
+                startBounds.right += deltaWidth;
+            } else {
+                // Extend start bounds vertically
+                startScale = (float) startBounds.width() / finalBounds.width();
+                float startHeight = startScale * finalBounds.height();
+                float deltaHeight = (startHeight - startBounds.height()) / 2;
+                startBounds.top -= deltaHeight;
+                startBounds.bottom += deltaHeight;
+            }
+
+            // Hide the thumbnail and show the zoomed-in view. When the animation begins,
+            // it will position the zoomed-in view in the place of the thumbnail.
+            imageView.setAlpha(0f);
+            expandedImageView.setVisibility(View.VISIBLE);
+
+            // Set the pivot point for SCALE_X and SCALE_Y transformations to the top-left corner of
+            // the zoomed-in view (the default is the center of the view).
+            expandedImageView.setPivotX(0f);
+            expandedImageView.setPivotY(0f);
+
+            // Construct and run the parallel animation of the four translation and scale properties
+            // (X, Y, SCALE_X, and SCALE_Y).
+            AnimatorSet set = new AnimatorSet();
+            set
+                    .play(ObjectAnimator.ofFloat(expandedImageView, View.X, startBounds.left,
+                            finalBounds.left))
+                    .with(ObjectAnimator.ofFloat(expandedImageView, View.Y, startBounds.top,
+                            finalBounds.top))
+                    .with(ObjectAnimator.ofFloat(expandedImageView, View.SCALE_X, startScale, 1f))
+                    .with(ObjectAnimator.ofFloat(expandedImageView, View.SCALE_Y, startScale, 1f));
+            set.setDuration(mShortAnimationDuration);
+            set.setInterpolator(new DecelerateInterpolator());
+            set.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mCurrentAnimator = null;
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+                    mCurrentAnimator = null;
+                }
+            });
+            set.start();
+            mCurrentAnimator = set;
+
+            // Upon clicking the zoomed-in image, it should zoom back down to the original bounds
+            // and show the thumbnail instead of the expanded image.
+            final float startScaleFinal = startScale;
+            expandedImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (mCurrentAnimator != null) {
+                        mCurrentAnimator.cancel();
+                    }
+
+                    // Animate the four positioning/sizing properties in parallel, back to their
+                    // original values.
+                    AnimatorSet set = new AnimatorSet();
+                    set
+                            .play(ObjectAnimator.ofFloat(expandedImageView, View.X, startBounds.left))
+                            .with(ObjectAnimator.ofFloat(expandedImageView, View.Y, startBounds.top))
+                            .with(ObjectAnimator
+                                    .ofFloat(expandedImageView, View.SCALE_X, startScaleFinal))
+                            .with(ObjectAnimator
+                                    .ofFloat(expandedImageView, View.SCALE_Y, startScaleFinal));
+                    set.setDuration(mShortAnimationDuration);
+                    set.setInterpolator(new DecelerateInterpolator());
+                    set.addListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            imageView.setAlpha(1f);
+                            expandedImageView.setVisibility(View.GONE);
+                            mCurrentAnimator = null;
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animation) {
+                            imageView.setAlpha(1f);
+                            expandedImageView.setVisibility(View.GONE);
+                            mCurrentAnimator = null;
+                        }
+                    });
+                    set.start();
+                    mCurrentAnimator = set;
+                }
+            });
         }
     }
 }

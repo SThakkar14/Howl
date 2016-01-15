@@ -38,6 +38,21 @@
             android:ems="10"
             android:inputType="textCapSentences|textMultiLine"
             android:maxLines="3" />
+
+
+        <ImageView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:visibility="visible"
+            android:id="@+id/imageView1" />
+
+        <!--<ImageButton-->
+            <!--android:id="@+id/showAttachmentLayout"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:src="@drawable/ic_attach_file_black_24dp"-->
+            <!--android:background="?attr/selectableItemBackgroundBorderless"-->
+            <!--/>-->
         <ImageButton
             android:id="@+id/takePicture"
             android:layout_width="wrap_content"
@@ -45,11 +60,13 @@
             android:src="@drawable/ic_photo_camera_black_24dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             />
-        <ImageView
-            android:layout_height="wrap_content"
+        <ImageButton
+            android:id="@+id/pickAPicture"
             android:layout_width="wrap_content"
-            android:visibility="visible"
-            android:id="@+id/imageView1" />
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_insert_photo_black_24dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            />
 
         <ImageButton
             android:id="@+id/commentOnAHowl"
@@ -63,6 +80,16 @@
 
     </TableRow>
 
+    <FrameLayout
+        android:id="@+id/attachmentOptions"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:visibility="gone"
+        android:layout_alignStart="@+id/howls_loading">
+
+
+
+    </FrameLayout>
 
 
 </RelativeLayout>
