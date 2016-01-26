@@ -9,6 +9,7 @@
     <string name="unfollow">Unfollow</string>
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="title_activity_new_howl">NewHowl</string>
+    <string name="project_number">1093247460385</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

@@ -421,6 +421,7 @@ public class HowlThread extends AppCompatActivity {
 
             api = retrofit.create(HowlApiClient.class);
         }
+        spinner.setVisibility(View.VISIBLE);
         String accessToken = AccessToken.getCurrentAccessToken().getToken();
         api.get_feed(accessToken, id).enqueue(new Callback<List<Howl>>() {
 
@@ -436,6 +437,7 @@ public class HowlThread extends AppCompatActivity {
 //                    }
                     adapter.notifyDataSetChanged();
                     recyclerView.scrollToPosition(comments.size() - 1);
+                    spinner.setVisibility(View.GONE);
                 } else {
                     Log.e("updateComments()", String.valueOf(response.code()));
                 }

@@ -1,14 +1,20 @@
 package boomer.com.howl.Activities;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
@@ -20,12 +26,16 @@ import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 
 import boomer.com.howl.Constants;
 import boomer.com.howl.HTTPCodes;
 import boomer.com.howl.HowlApiClient;
 import boomer.com.howl.Objects.UserProfile;
 import boomer.com.howl.R;
+import boomer.com.howl.Services.QuickstartPreferences;
+import boomer.com.howl.Services.RegistrationIntentService;
 import retrofit.Callback;
 import retrofit.GsonConverterFactory;
 import retrofit.Response;
@@ -33,6 +43,10 @@ import retrofit.Retrofit;
 
 public class SplashScreen extends AppCompatActivity {
     CallbackManager callbackManager;
+    private BroadcastReceiver deviceRegistrationBroadcastReceiver;
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    private static final String TAG = "SplashScreen";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,8 +87,49 @@ public class SplashScreen extends AppCompatActivity {
             loginButton.startAnimation(animation);
             loginButton.setVisibility(View.VISIBLE);
         } else {
+            //TODO: invoke the regintentService here
+            if (checkPlayServices()) {
+                // Start IntentService to register this application with GCM.
+                Intent intent = new Intent(this, RegistrationIntentService.class);
+                startService(intent);
+            }
+            deviceRegistrationBroadcastReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    SharedPreferences sharedPreferences =
+                            PreferenceManager.getDefaultSharedPreferences(context);
+                    boolean sentToken = sharedPreferences
+                            .getBoolean(QuickstartPreferences.SENT_TOKEN_TO_SERVER, false);
+                    String device_token = intent.getStringExtra("device_token");
+                    Log.i(TAG , device_token);
+//                    if (sentToken) {
+//                        mInformationTextView.setText(getString(R.string.gcm_send_message));
+//                    } else {
+//                        mInformationTextView.setText(getString(R.string.token_error_message));
+//                    }
+                }
+            };
+
+
+
             contactServer();
         }
+    }
+
+    private boolean checkPlayServices() {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
+                        .show();
+            } else {
+                Log.i(TAG, "This device is not supported.");
+                finish();
+            }
+            return false;
+        }
+        return true;
     }
 
     private void contactServer() {
@@ -126,10 +181,13 @@ public class SplashScreen extends AppCompatActivity {
 
         // Logs 'install' and 'app activate' App Events.
         AppEventsLogger.activateApp(this);
+        LocalBroadcastManager.getInstance(this).registerReceiver(deviceRegistrationBroadcastReceiver,
+                new IntentFilter(QuickstartPreferences.REGISTRATION_COMPLETE));
     }
 
     @Override
     protected void onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(deviceRegistrationBroadcastReceiver);
         super.onPause();
 
         // Logs 'app deactivate' App Event.

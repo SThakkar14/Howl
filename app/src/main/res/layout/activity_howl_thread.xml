@@ -17,7 +17,7 @@
         android:scrollbars="vertical" />
     <ProgressBar
         android:id="@+id/howls_loading"
-        style="@android:style/Widget.ProgressBar.Small"
+        style="@android:style/Widget.ProgressBar.Large"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"

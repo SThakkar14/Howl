@@ -16,6 +16,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.android.gms.gcm.GoogleCloudMessaging;
+
+import java.io.IOException;
+
 import boomer.com.howl.Fragments.FollowingFragment;
 import boomer.com.howl.Fragments.HowlsFragment;
 import boomer.com.howl.Fragments.OtherFragment;
@@ -26,7 +30,7 @@ import boomer.com.howl.R;
 public class LandingPage extends AppCompatActivity {
 
     UserProfile initialProfile;
-
+    private GoogleCloudMessaging gcm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +39,14 @@ public class LandingPage extends AppCompatActivity {
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
+//        gcm = GoogleCloudMessaging.getInstance(this);
+//        String regid = getRegistrationId(context);
+//
+//        try {
+//            gcm.register(getString(R.string.project_number));
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
