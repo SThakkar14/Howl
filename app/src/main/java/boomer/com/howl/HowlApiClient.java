@@ -24,7 +24,11 @@ import retrofit.http.Path;
 public interface HowlApiClient {
     @Headers(Constants.CONTENT_TYPE)
     @POST("/api/v1/login")
-    Call<UserProfile> login(@Header("x-token") String token);
+    Call<UserProfile> login(@Header("x-token") String token , @Header("x-device-id")String deviceId);
+
+    @Headers(Constants.CONTENT_TYPE)
+    @POST("/api/v1/login")
+    Call<UserProfile> login_without_device_id(@Header("x-token") String token );
 
     @Headers(Constants.CONTENT_TYPE)
     @GET("/api/v1/howls")

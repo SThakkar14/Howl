@@ -5,7 +5,7 @@ import java.util.List;
 
 public class UserProfile implements Serializable {
     String id;
-    List<String> devices;
+//    List<String> devices;
     String email;
     long created;
     List<String> zipcodes;
@@ -16,9 +16,9 @@ public class UserProfile implements Serializable {
 
     }
 
-    public UserProfile(String id, List<String> devices, String email, long created, List<String> zipcodes, List<Pet> pets, List<Howl> howls) {
+    public UserProfile(String id, String email, long created, List<String> zipcodes, List<Pet> pets, List<Howl> howls) {
         this.id = id;
-        this.devices = devices;
+        //this.devices = devices;
         this.email = email;
         this.created = created;
         this.zipcodes = zipcodes;
@@ -30,7 +30,7 @@ public class UserProfile implements Serializable {
     public String toString() {
         return "UserProfile{" +
                 "id='" + id + '\'' +
-                ", devices=" + devices +
+//                ", devices=" + devices +
                 ", email='" + email + '\'' +
                 ", created=" + created +
                 ", zipcodes=" + zipcodes +
@@ -47,13 +47,13 @@ public class UserProfile implements Serializable {
         this.id = id;
     }
 
-    public List<String> getDevices() {
-        return devices;
-    }
-
-    public void setDevices(List<String> devices) {
-        this.devices = devices;
-    }
+//    public List<String> getDevices() {
+//        return devices;
+//    }
+//
+//    public void setDevices(List<String> devices) {
+//        this.devices = devices;
+//    }
 
     public String getEmail() {
         return email;

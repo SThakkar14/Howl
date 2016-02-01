@@ -64,7 +64,10 @@ public class SplashScreen extends AppCompatActivity {
             loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
                 @Override
                 public void onSuccess(LoginResult loginResult) {
-                    contactServer();
+                    Log.i(TAG, "getCurrentAccessToken is NULL");
+//                    registerTheDeviceWithGCM();
+                    //TODO: putting registerTheDeviceWithGCM(); hangs the splashscreen
+                    contactServer(null);
                 }
 
                 @Override
@@ -87,33 +90,29 @@ public class SplashScreen extends AppCompatActivity {
             loginButton.startAnimation(animation);
             loginButton.setVisibility(View.VISIBLE);
         } else {
-            //TODO: invoke the regintentService here
-            if (checkPlayServices()) {
-                // Start IntentService to register this application with GCM.
-                Intent intent = new Intent(this, RegistrationIntentService.class);
-                startService(intent);
-            }
-            deviceRegistrationBroadcastReceiver = new BroadcastReceiver() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    SharedPreferences sharedPreferences =
-                            PreferenceManager.getDefaultSharedPreferences(context);
-                    boolean sentToken = sharedPreferences
-                            .getBoolean(QuickstartPreferences.SENT_TOKEN_TO_SERVER, false);
-                    String device_token = intent.getStringExtra("device_token");
-                    Log.i(TAG , device_token);
-//                    if (sentToken) {
-//                        mInformationTextView.setText(getString(R.string.gcm_send_message));
-//                    } else {
-//                        mInformationTextView.setText(getString(R.string.token_error_message));
-//                    }
-                }
-            };
+            registerTheDeviceWithGCM();
 
-
-
-            contactServer();
         }
+    }
+
+    private void registerTheDeviceWithGCM(){
+        if (checkPlayServices()) {
+            // Start IntentService to register this application with GCM.
+            Intent intent = new Intent(this, RegistrationIntentService.class);
+            startService(intent);
+        }
+        deviceRegistrationBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                SharedPreferences sharedPreferences =
+                        PreferenceManager.getDefaultSharedPreferences(context);
+                boolean generatedToken = sharedPreferences
+                        .getBoolean(QuickstartPreferences.SENT_TOKEN_TO_SERVER, false);
+                String device_token = intent.getStringExtra("device_token");
+                Log.i(TAG , device_token);
+                contactServer(device_token);
+            }
+        };
     }
 
     private boolean checkPlayServices() {
@@ -132,7 +131,9 @@ public class SplashScreen extends AppCompatActivity {
         return true;
     }
 
-    private void contactServer() {
+
+
+    private void contactServer(String deviceToken) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Constants.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -140,7 +141,7 @@ public class SplashScreen extends AppCompatActivity {
 
         HowlApiClient api = retrofit.create(HowlApiClient.class);
         String accessToken = AccessToken.getCurrentAccessToken().getToken();
-        api.login(accessToken).enqueue(new Callback<UserProfile>() {
+        api.login(accessToken ,deviceToken).enqueue(new Callback<UserProfile>() {
             @Override
             public void onResponse(Response<UserProfile> response, Retrofit retrofit) {
                 if (response.code() == HTTPCodes.OK) {
@@ -157,7 +158,7 @@ public class SplashScreen extends AppCompatActivity {
 
             @Override
             public void onFailure(Throwable t) {
-
+                Log.e(TAG, "Failure in the retrofit call"+t.getMessage());
             }
         });
     }
